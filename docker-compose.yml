@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    container_name: postgres_fastapi
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+    - "${POSTGRES_PORT}:5432"
+    volumes:
+    - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: fastapi_app
+    env_file: .env
+    volumes:
+    - .:/app
+    ports:
+    - "${APP_PORT}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "while ! nc -z db 5432; do sleep 2; done && \
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PYTHONPATH: "/app"
+      APP_HOST: ${APP_HOST}
+      APP_RELOAD: ${APP_RELOAD}
+      APP_WORKERS: ${APP_WORKERS}
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

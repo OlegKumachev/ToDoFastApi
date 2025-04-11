@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "todofastapi"
+version = "0.1.0"
+description = "FastAPI app"
+authors = ["Oleg Kumachev <kumachev.oleg@gmail.com>"]## Зависимости
+
+- **fastapi**: Фреймворк для создания API
+- **asyncpg**: Для работы с PostgreSQL
+- **uvicorn**: Сервер для запуска FastAPI
+- **poetry**: Для управления зависимостями и виртуальными окружениями
+
+---
+
+Если нужно что-то уточнить или добавить, дайте знать!
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.2"
+uvicorn = { extras = ["standard"], version = "^0.34.0" }
+asyncpg = "^0.30.0"
+psycopg2 = "^2.9.10"
+environs = "^14.1.1"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4.2.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
