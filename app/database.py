@@ -33,10 +33,11 @@ async def init_db(app: FastAPI):
                 description TEXT,
                 due_date DATE,
                 is_completed BOOLEAN DEFAULT FALSE,
-                created_at TIMESTAMP  DEFAULT NOW()
+                created_at TIMESTAMP DEFAULT NOW()
             )
         """,
         )
+
 
 async def disconnect_from_db(app: FastAPI):
     await app.state.pool.close()

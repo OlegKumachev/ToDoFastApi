@@ -53,7 +53,6 @@ async def get_tasks_from_db():
 
 async def get_task_id(task_id: int):
     async with get_db() as conn:
-
         query = await conn.fetchrow(
             """
                 SELECT id,
@@ -108,7 +107,6 @@ async def update_task_in_db(
 
 async def delete_task(task_id: int):
     async with get_db() as conn:
-
         result = await conn.fetchrow(
             """
             DELETE FROM tasks WHERE id = $1 RETURNING id;
@@ -124,7 +122,6 @@ async def get_tasks_by_status_or_date(
     due_date: Optional[str] = None,
     order: str = "asc",
 ):
-
     async with get_db() as conn:
         query = "SELECT * FROM tasks WHERE 1=1"
         params = []

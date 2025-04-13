@@ -2,17 +2,7 @@
 name = "todofastapi"
 version = "0.1.0"
 description = "FastAPI app"
-authors = ["Oleg Kumachev <kumachev.oleg@gmail.com>"]## Зависимости
-
-- **fastapi**: Фреймворк для создания API
-- **asyncpg**: Для работы с PostgreSQL
-- **uvicorn**: Сервер для запуска FastAPI
-- **poetry**: Для управления зависимостями и виртуальными окружениями
-
----
-
-Если нужно что-то уточнить или добавить, дайте знать!
-readme = "README.md"
+authors = ["Oleg Kumachev <kumachev.oleg@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.11"

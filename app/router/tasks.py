@@ -1,6 +1,6 @@
-from typing import List, Optional
+from typing import Annotated, List, Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.crud import (
     create_task_in_db,
@@ -15,8 +15,8 @@ from app.schemas import Task, TaskCreate, TasksBase
 router = APIRouter()
 
 
-@router.post("/tasks/", response_model=Task)
-async def create_task(task: TaskCreate):
+@router.post("/tasks/", response_model=Task, tags=["Создание задачи"])
+async def create_task(task: Annotated[TaskCreate, Depends()]):
     try:
         return await create_task_in_db(
             title=task.title,
@@ -27,7 +27,7 @@ async def create_task(task: TaskCreate):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/tasks/", response_model=list[Task])
+@router.get("/tasks/", response_model=list[Task], tags=["Получение данных"])
 async def get_tasks():
     try:
         tasks = await get_tasks_from_db()
@@ -36,7 +36,7 @@ async def get_tasks():
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/tasks/{id}", response_model=Task)
+@router.get("/tasks/{id}", response_model=Task, tags=["Получение данных"])
 async def get_task(task_id: int):
     try:
         task = await get_task_id(task_id)
@@ -53,8 +53,28 @@ async def get_task(task_id: int):
         )
 
 
-@router.put("/tasks/{id}")
-async def update_task(task_id: int, task: TasksBase):
+@router.get(
+    "/tasks/search/", response_model=List[Task], tags=["Получение данных"]
+)
+async def search_tasks(
+    is_completed: Optional[bool] = None,
+    order: str = "asc",
+):
+    try:
+        tasks = await get_tasks_by_status_or_date(
+            is_completed=is_completed,
+            order=order,
+        )
+        return tasks
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal Server Error: {str(e)}",
+        )
+
+
+@router.put("/tasks/{id}", tags=["Обновлние данных"])
+async def update_task(task_id: int, task: Annotated[TasksBase, Depends()]):
     try:
         upd_task = await update_task_in_db(
             task_id=task_id,
@@ -73,7 +93,7 @@ async def update_task(task_id: int, task: TasksBase):
         )
 
 
-@router.delete("/tasks/{id}", response_model=dict)
+@router.delete("/tasks/{id}", response_model=dict, tags=["Удаление задачи"])
 async def remove_task(task_id: int):
     deleted_task = await delete_task(task_id)
 
@@ -81,23 +101,3 @@ async def remove_task(task_id: int):
         raise HTTPException(status_code=404, detail="Task not found")
 
     return {"message": f"Task {task_id} deleted successfully"}
-
-
-@router.get("/tasks/search/", response_model=List[Task])
-async def search_tasks(
-    due_date: Optional[str] = None,
-    is_completed: Optional[bool] = None,
-    order: str = "asc",
-):
-    try:
-        tasks = await get_tasks_by_status_or_date(
-            due_date=due_date,
-            is_completed=is_completed,
-            order=order,
-        )
-        return tasks
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Internal Server Error: {str(e)}",
-        )
