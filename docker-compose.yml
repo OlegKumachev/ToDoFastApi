@@ -37,9 +37,6 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL}
       PYTHONPATH: "/app"
-      APP_HOST: ${APP_HOST}
-      APP_RELOAD: ${APP_RELOAD}
-      APP_WORKERS: ${APP_WORKERS}
     restart: unless-stopped
 
 volumes:

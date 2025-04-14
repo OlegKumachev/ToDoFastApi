@@ -4,3 +4,5 @@ __pycache__/
 static/
 .env
 .env.prod
+.vscode/
+.ruff_cache/

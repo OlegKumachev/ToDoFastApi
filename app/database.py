@@ -7,19 +7,18 @@ from fastapi import FastAPI
 env = Env()
 env.read_env()
 
-DATABASE_URL = env("DATABASE_URL")
-
 
 @asynccontextmanager
 async def get_db():
-    pool = await asyncpg.create_pool(DATABASE_URL)
-    async with pool.acquire() as conn:
+    conn = await asyncpg.connect(env("DATABASE_URL"))
+    try:
         yield conn
-    await pool.close()
+    finally:
+        await conn.close()
 
 
 async def connect_to_db(app: FastAPI):
-    app.state.pool = await asyncpg.create_pool(DATABASE_URL)
+    app.state.pool = await asyncpg.create_pool(env("DATABASE_URL"))
     await init_db(app)
 
 
@@ -35,7 +34,7 @@ async def init_db(app: FastAPI):
                 is_completed BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT NOW()
             )
-        """,
+            """
         )
 
 
